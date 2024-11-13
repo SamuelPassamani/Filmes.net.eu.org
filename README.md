@@ -5,7 +5,7 @@ Filmes.net.eu.org é um player de vídeo para streaming de torrents, construído
 ## Tecnologias
 
 - HTML, CSS, JavaScript
-- www.webtor.io
+- https://webtor.io
 
 ## Funcionalidades
 
