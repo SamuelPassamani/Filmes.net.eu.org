@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MakingOff Torrent Player</title>
+    <title>Filmes.net.eu.org / Torrent Player</title>
     <style>
         html, body {
             margin: 0;
@@ -15,7 +15,6 @@
         #player {
             height: 100vh;
             width: 100%;
-            position: relative;
         }
         
         #iframe {
@@ -57,27 +56,23 @@
 
         const movieId = getQueryStringParameter('id');
         const imdbId = getQueryStringParameter('imdb_id');
-        const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
 
         if (!movieId) {
             console.error('ID do filme não encontrado na URL');
         } else {
-            let posterUrl = defaultPoster;
-
             if (imdbId) {
                 fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
                     .then(response => response.json())
                     .then(data => {
-                        posterUrl = data.data.movie.background_image || defaultPoster;
+                        const posterUrl = data.data.movie.background_image;
 
                         initializePlayer(movieId, posterUrl);
                     })
                     .catch(error => {
                         console.error('Erro ao buscar imagem de fundo:', error);
-                        initializePlayer(movieId, posterUrl);
                     });
             } else {
-                initializePlayer(movieId, posterUrl);
+                console.error('ID do IMDb não encontrado na URL');
             }
         }
 
@@ -101,7 +96,6 @@
                     autoSubtitles: true,
                     continue: true,
                     title: false,
-                    header: false,
                     p2pProgress: true,
                     subtitles: true,
                     settings: false,
@@ -117,11 +111,10 @@
                     chromecast: true,
                 },
                 on: function(e) {
-                    if (e.name === window.webtor.TORRENT_FETCHED) {
+                    if (e.name == window.webtor.TORRENT_FETCHED) {
                         console.log('Torrent fetched!', e.data);
-                        hideImage(); // Esconde a imagem quando o torrent for carregado
                     }
-                    if (e.name === window.webtor.TORRENT_ERROR) {
+                    if (e.name == window.webtor.TORRENT_ERROR) {
                         console.log('Torrent error!');
                     }
                 },
@@ -150,6 +143,23 @@
         var hideImageTimeout;
         document.addEventListener('mousemove', function() {
             showImage();
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var iframe = document.getElementById('myIframe');
+
+            iframe.requestFullscreen().catch(err => {
+                console.log(`Erro ao tentar entrar em tela cheia: ${err.message}`);
+            });
+
+            document.addEventListener('fullscreenchange', (event) => {
+                if (!document.fullscreenElement) {
+                    iframe.requestFullscreen().catch(err => {
+                        console.log(`Erro ao tentar entrar em tela cheia novamente: ${err.message}`);
+                    });
+                }
+            });
         });
     </script>
 </body>
