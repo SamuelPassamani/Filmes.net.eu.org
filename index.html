@@ -10,28 +10,22 @@
             padding: 0;
             overflow: hidden;
             height: 100%;
-            background: black;
-        }
-
-        #background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-size: cover;
-            background-position: center;
-            z-index: 0;
-            filter: blur(15px);
         }
 
         #player {
-            position: fixed;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        #iframe {
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         #imagem-topo {
@@ -41,10 +35,16 @@
             transition: opacity 1s ease-out;
             z-index: 2;
         }
+
+        @media (max-width: 600px) {
+            #imagem-topo {
+                top: 5px;
+                right: 5px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="background"></div>
     <div id="player"></div>
     <a id="imagem-topo-link" href="https://makingoff.eu.org/">
         <img id="imagem-topo" src="https://i.imgur.com/1inVaQD.png" alt="MakingOff Filmes">
@@ -58,52 +58,64 @@
         }
 
         const movieId = getQueryStringParameter('id');
+        const imdbId = getQueryStringParameter('imdb_id');
 
         if (!movieId) {
             console.error('ID do filme não encontrado na URL');
         } else {
-            const magnet = `magnet:?xt=urn:btih:${movieId}&dn=${movieId}`;
+            if (imdbId) {
+                fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const posterUrl = data.data.movie.background_image || 'https://i.imgur.com/IG0AIMf.jpeg';
+                        initializePlayer(movieId, posterUrl);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar imagem de fundo:', error);
+                        initializePlayer(movieId, 'https://i.imgur.com/IG0AIMf.jpeg');
+                    });
+            } else {
+                initializePlayer(movieId, 'https://i.imgur.com/IG0AIMf.jpeg');
+            }
+        }
 
-            // Configurar o player Webtor
+        function initializePlayer(movieId, posterUrl) {
+            const magnetLink = `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`;
             window.webtor = window.webtor || [];
             window.webtor.push({
                 id: 'player',
-                magnet: magnet,
+                magnet: magnetLink,
+                poster: posterUrl,
                 width: '100%',
                 height: '100%',
                 features: {
-                    subtitles: true,
+                    autoSubtitles: true,
+                    continue: true,
+                    title: false,
+                    header: false,
                     p2pProgress: true,
-                    playpause: true,
-                    timeline: true,
+                    subtitles: true,
+                    settings: false,
+                    embed: false,
+                    browse: false,
+                    download: false,
                     fullscreen: true,
+                    playpause: true,
+                    currentTime: true,
+                    timeline: true,
+                    duration: true,
                     volume: true,
                     chromecast: true,
                 },
                 on: function(e) {
-                    if (e.name === window.webtor.TORRENT_FETCHED) {
-                        console.log('Torrent fetched:', e.data);
-                        hideBackground();
-                    } else if (e.name === window.webtor.TORRENT_ERROR) {
-                        console.log('Erro no Torrent');
+                    if (e.name == window.webtor.TORRENT_FETCHED) {
+                        console.log('Torrent fetched!', e.data);
                     }
-                }
+                    if (e.name == window.webtor.TORRENT_ERROR) {
+                        console.log('Torrent error!');
+                    }
+                },
             });
-
-            // Buscar imagem de fundo na API YTS
-            fetch(`https://yts.mx/api/v2/movie_details.json?movie_id=${movieId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const backgroundUrl = data.data.movie.background_image_original;
-                    document.getElementById('background').style.backgroundImage = `url(${backgroundUrl})`;
-                })
-                .catch(error => console.error('Erro ao buscar imagem de fundo:', error));
-        }
-
-        function hideBackground() {
-            const background = document.getElementById('background');
-            background.style.opacity = '0';
-            setTimeout(() => { background.style.display = 'none'; }, 1000);
         }
 
         function hideImage() {
@@ -126,7 +138,9 @@
         }
 
         var hideImageTimeout;
-        document.addEventListener('mousemove', showImage);
+        document.addEventListener('mousemove', function() {
+            showImage();
+        });
     </script>
 </body>
 </html>
