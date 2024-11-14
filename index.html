@@ -11,12 +11,22 @@
             overflow: hidden;
             height: 100%;
         }
-
+        
         #player {
             height: 100vh;
             width: 100%;
+            position: relative;
         }
-
+        
+        #iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
         #imagem-topo {
             position: absolute;
             top: 10px;
@@ -59,6 +69,7 @@
                     .then(response => response.json())
                     .then(data => {
                         posterUrl = data.data.movie.background_image || defaultPoster;
+
                         initializePlayer(movieId, posterUrl);
                     })
                     .catch(error => {
@@ -91,7 +102,6 @@
                     continue: true,
                     title: false,
                     header: false,
-                    imdbId: ${imdbId},
                     p2pProgress: true,
                     subtitles: true,
                     settings: false,
@@ -107,11 +117,11 @@
                     chromecast: true,
                 },
                 on: function(e) {
-                    if (e.name == window.webtor.TORRENT_FETCHED) {
+                    if (e.name === window.webtor.TORRENT_FETCHED) {
                         console.log('Torrent fetched!', e.data);
-                        hideImage(); // Ocultar imagem quando o torrent estiver carregado
+                        hideImage(); // Esconde a imagem quando o torrent for carregado
                     }
-                    if (e.name == window.webtor.TORRENT_ERROR) {
+                    if (e.name === window.webtor.TORRENT_ERROR) {
                         console.log('Torrent error!');
                     }
                 },
@@ -126,7 +136,6 @@
             }, 1000);
         }
 
-        // Mostrar a imagem quando o mouse se mover
         function showImage() {
             var img = document.getElementById('imagem-topo');
             img.style.display = 'block';
