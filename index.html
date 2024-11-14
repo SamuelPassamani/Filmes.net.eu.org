@@ -11,29 +11,18 @@
             overflow: hidden;
             height: 100%;
         }
-
+        
         #player {
             height: 100vh;
             width: 100%;
-            position: relative;
-            z-index: 1;
         }
-
-        #iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
+        
         #imagem-topo {
             position: absolute;
             top: 10px;
             right: 10px;
+            z-index: 10;
             transition: opacity 1s ease-out;
-            z-index: 2;
         }
 
         @media (max-width: 600px) {
@@ -67,20 +56,21 @@
                 fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
                     .then(response => response.json())
                     .then(data => {
-                        const posterUrl = data.data.movie.background_image || 'https://i.imgur.com/IG0AIMf.jpeg';
+                        const posterUrl = data.data.movie.background_image;
                         initializePlayer(movieId, posterUrl);
                     })
                     .catch(error => {
                         console.error('Erro ao buscar imagem de fundo:', error);
-                        initializePlayer(movieId, 'https://i.imgur.com/IG0AIMf.jpeg');
+                        initializePlayer(movieId, null);
                     });
             } else {
-                initializePlayer(movieId, 'https://i.imgur.com/IG0AIMf.jpeg');
+                initializePlayer(movieId, null);
             }
         }
 
         function initializePlayer(movieId, posterUrl) {
             const magnetLink = `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`;
+
             window.webtor = window.webtor || [];
             window.webtor.push({
                 id: 'player',
