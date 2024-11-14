@@ -8,30 +8,22 @@
         html, body {
             margin: 0;
             padding: 0;
+            height: 100%;
             overflow: hidden;
-            height: 100%;
         }
-        
+
         #player {
-            height: 100%;
             width: 100%;
+            height: 100vh;
+            position: relative;
         }
-        
-        #iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
+
         #imagem-topo {
             position: absolute;
             top: 10px;
             right: 10px;
+            z-index: 10;
             transition: opacity 1s ease-out;
-            z-index: 10; /* Garante que a imagem ficará sobreposta ao player */
         }
 
         @media (max-width: 600px) {
@@ -48,7 +40,7 @@
         <img id="imagem-topo" src="https://i.imgur.com/1inVaQD.png" alt="MakingOff Filmes">
     </a>
 
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" async charset="utf-8"></script>
     <script>
         function getQueryStringParameter(name) {
             const params = new URLSearchParams(window.location.search);
@@ -78,21 +70,13 @@
         }
 
         function initializePlayer(movieId, posterUrl) {
-            const movies = [
-                {
-                    id: movieId,
-                    magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
-                    poster: posterUrl
-                }
-            ];
-
             window.webtor = window.webtor || [];
             window.webtor.push({
                 id: 'player',
-                magnet: movies[0].magnet,
-                poster: movies[0].poster,
+                magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
+                poster: posterUrl,
                 width: '100%',
-                height: '100%',
+                height: '100vh',
                 features: {
                     autoSubtitles: true,
                     continue: true,
@@ -112,28 +96,29 @@
                     chromecast: true,
                 },
                 on: function(e) {
-                    if (e.name == window.webtor.TORRENT_FETCHED) {
+                    if (e.name === window.webtor.TORRENT_FETCHED) {
                         console.log('Torrent fetched!', e.data);
                     }
-                    if (e.name == window.webtor.TORRENT_ERROR) {
+                    if (e.name === window.webtor.TORRENT_ERROR) {
                         console.log('Torrent error!');
                     }
                 },
             });
         }
 
+        let hideImageTimeout;
         function hideImage() {
-            var img = document.getElementById('imagem-topo');
+            const img = document.getElementById('imagem-topo');
             img.style.opacity = '0';
-            setTimeout(function() {
+            setTimeout(() => {
                 img.style.display = 'none';
             }, 1000);
         }
 
         function showImage() {
-            var img = document.getElementById('imagem-topo');
+            const img = document.getElementById('imagem-topo');
             img.style.display = 'block';
-            setTimeout(function() {
+            setTimeout(() => {
                 img.style.opacity = '1';
             }, 10);
 
@@ -141,27 +126,7 @@
             hideImageTimeout = setTimeout(hideImage, 5000);
         }
 
-        var hideImageTimeout;
-        document.addEventListener('mousemove', function() {
-            showImage();
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var iframe = document.getElementById('myIframe');
-
-            iframe.requestFullscreen().catch(err => {
-                console.log(`Erro ao tentar entrar em tela cheia: ${err.message}`);
-            });
-
-            document.addEventListener('fullscreenchange', (event) => {
-                if (!document.fullscreenElement) {
-                    iframe.requestFullscreen().catch(err => {
-                        console.log(`Erro ao tentar entrar em tela cheia novamente: ${err.message}`);
-                    });
-                }
-            });
-        });
+        document.addEventListener('mousemove', showImage);
     </script>
 </body>
 </html>
