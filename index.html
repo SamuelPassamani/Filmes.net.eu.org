@@ -1,130 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player de Filmes</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #000;
-    }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmes.net.eu.org / Torrent Player</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        #player {
+            height: 100vh;
+            width: 100%;
+        }
+        
+        #iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        #imagem-topo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transition: opacity 1s ease-out;
+        }
 
-    #player-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    #top-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      opacity: 0.5;
-      background-size: cover;
-      background-position: center;
-    }
-  </style>
+        @media (max-width: 600px) {
+            #imagem-topo {
+                top: 5px;
+                right: 5px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div id="player"></div>
+    <a id="imagem-topo-link" href="https://makingoff.eu.org/">
+        <img id="imagem-topo" src="https://i.imgur.com/1inVaQD.png" alt="MakingOff Filmes">
+    </a>
 
-<div id="top-image"></div>
-<div id="player-container">
-  <iframe id="player" frameborder="0" allowfullscreen></iframe>
-</div>
-
-<script>
-  async function fetchMovieData(imdbId) {
-    try {
-      const response = await fetch(`https://yts.mx/api/v2/list_movies.json?query_term=${imdbId}`);
-      const data = await response.json();
-      const movies = data.data.movies;
-
-      if (movies && movies.length > 0) {
-        const movie = movies[0];
-        
-        // Define o poster como plano de fundo
-        document.getElementById('top-image').style.backgroundImage = `url(${movie.large_cover_image})`;
-
-        // Inicializa o player
-        initializePlayer(movie.torrents[0].url, movie.large_cover_image);
-      } else {
-        console.error("Filme não encontrado na API YTS.");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados do filme:", error);
-    }
-  }
-
-  function initializePlayer(magnet, poster) {
-    const player = document.getElementById('player');
-    player.src = `https://webtor.io/embed?magnet=${encodeURIComponent(magnet)}`;
-    
-    // Configurações adicionais do player
-    player.setAttribute('width', '100%');
-    player.setAttribute('height', '100%');
-    player.setAttribute('allow', 'autoplay; fullscreen');
-
-    const embedOptions = {
-      id: 'player',
-      magnet: magnet,
-      poster: poster,
-      width: '100%',
-      height: '100%',
-      features: {
-        autoSubtitles: true,
-        continue: true,
-        title: false,
-        header: false,
-        p2pProgress: true,
-        subtitles: true,
-        settings: false,
-        embed: false,
-        browse: false,
-        download: false,
-        fullscreen: true,
-        playpause: true,
-        currentTime: true,
-        timeline: true,
-        duration: true,
-        volume: true,
-        chromecast: true,
-      },
-    };
-
-    // Inicializa o Webtor SDK
-    window.Webtor = window.Webtor || [];
-    window.Webtor.push({
-      id: "player",
-      magnet: embedOptions.magnet,
-      poster: embedOptions.poster,
-      width: embedOptions.width,
-      height: embedOptions.height,
-      features: embedOptions.features,
-      on: function(event) {
-        if (event.name == window.Webtor.Events.DID_READY) {
-          console.log("Webtor player está pronto.");
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8"></script>
+    <script>
+        function getQueryStringParameter(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
         }
-      },
-    });
-  }
 
-  // Chame a função com o IMDb ID do filme desejado
-  fetchMovieData("tt1727587");
-</script>
+        const movieId = getQueryStringParameter('id');
+        const imdbId = getQueryStringParameter('imdb_id');
+        const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
 
+        if (!movieId) {
+            console.error('ID do filme não encontrado na URL');
+        } else {
+            let posterUrl = defaultPoster;
+
+            if (imdbId) {
+                fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        posterUrl = data.data.movie.background_image || defaultPoster;
+
+                        initializePlayer(movieId, posterUrl);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar imagem de fundo:', error);
+                        initializePlayer(movieId, posterUrl);
+                    });
+            } else {
+                initializePlayer(movieId, posterUrl);
+            }
+        }
+
+        function initializePlayer(movieId, posterUrl) {
+            const movies = [
+                {
+                    id: movieId,
+                    magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
+                    poster: posterUrl
+                }
+            ];
+
+            window.webtor = window.webtor || [];
+            window.webtor.push({
+                id: 'player',
+                magnet: movies[0].magnet,
+                poster: movies[0].poster,
+                width: '100%',
+                height: '100%',
+                features: {
+                    autoSubtitles: true,
+                    continue: true,
+                    title: false,
+                    p2pProgress: true,
+                    subtitles: true,
+                    settings: false,
+                    embed: false,
+                    browse: false,
+                    download: false,
+                    fullscreen: true,
+                    playpause: true,
+                    currentTime: true,
+                    timeline: true,
+                    duration: true,
+                    volume: true,
+                    chromecast: true,
+                },
+                on: function(e) {
+                    if (e.name == window.webtor.TORRENT_FETCHED) {
+                        console.log('Torrent fetched!', e.data);
+                    }
+                    if (e.name == window.webtor.TORRENT_ERROR) {
+                        console.log('Torrent error!');
+                    }
+                },
+            });
+        }
+
+        function hideImage() {
+            var img = document.getElementById('imagem-topo');
+            img.style.opacity = '0';
+            setTimeout(function() {
+                img.style.display = 'none';
+            }, 1000);
+        }
+
+        function showImage() {
+            var img = document.getElementById('imagem-topo');
+            img.style.display = 'block';
+            setTimeout(function() {
+                img.style.opacity = '1';
+            }, 10);
+
+            clearTimeout(hideImageTimeout);
+            hideImageTimeout = setTimeout(hideImage, 5000);
+        }
+
+        var hideImageTimeout;
+        document.addEventListener('mousemove', function() {
+            showImage();
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var iframe = document.getElementById('myIframe');
+
+            iframe.requestFullscreen().catch(err => {
+                console.log(`Erro ao tentar entrar em tela cheia: ${err.message}`);
+            });
+
+            document.addEventListener('fullscreenchange', (event) => {
+                if (!document.fullscreenElement) {
+                    iframe.requestFullscreen().catch(err => {
+                        console.log(`Erro ao tentar entrar em tela cheia novamente: ${err.message}`);
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
