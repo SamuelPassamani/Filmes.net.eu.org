@@ -17,15 +17,6 @@
             width: 100%;
         }
         
-        #iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
         #imagem-topo {
             position: absolute;
             top: 10px;
@@ -68,7 +59,6 @@
                     .then(response => response.json())
                     .then(data => {
                         posterUrl = data.data.movie.background_image || defaultPoster;
-
                         initializePlayer(movieId, posterUrl);
                     })
                     .catch(error => {
@@ -81,19 +71,11 @@
         }
 
         function initializePlayer(movieId, posterUrl) {
-            const movies = [
-                {
-                    id: movieId,
-                    magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
-                    poster: posterUrl
-                }
-            ];
-
             window.webtor = window.webtor || [];
             window.webtor.push({
                 id: 'player',
-                magnet: movies[0].magnet,
-                poster: movies[0].poster,
+                magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
+                poster: posterUrl,
                 width: '100%',
                 height: '100%',
                 features: {
@@ -126,17 +108,17 @@
         }
 
         function hideImage() {
-            var img = document.getElementById('imagem-topo');
+            const img = document.getElementById('imagem-topo');
             img.style.opacity = '0';
-            setTimeout(function() {
+            setTimeout(() => {
                 img.style.display = 'none';
             }, 1000);
         }
 
         function showImage() {
-            var img = document.getElementById('imagem-topo');
+            const img = document.getElementById('imagem-topo');
             img.style.display = 'block';
-            setTimeout(function() {
+            setTimeout(() => {
                 img.style.opacity = '1';
             }, 10);
 
@@ -144,26 +126,9 @@
             hideImageTimeout = setTimeout(hideImage, 5000);
         }
 
-        var hideImageTimeout;
-        document.addEventListener('mousemove', function() {
+        let hideImageTimeout;
+        document.addEventListener('mousemove', () => {
             showImage();
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var iframe = document.getElementById('myIframe');
-
-            iframe.requestFullscreen().catch(err => {
-                console.log(`Erro ao tentar entrar em tela cheia: ${err.message}`);
-            });
-
-            document.addEventListener('fullscreenchange', (event) => {
-                if (!document.fullscreenElement) {
-                    iframe.requestFullscreen().catch(err => {
-                        console.log(`Erro ao tentar entrar em tela cheia novamente: ${err.message}`);
-                    });
-                }
-            });
         });
     </script>
 </body>
