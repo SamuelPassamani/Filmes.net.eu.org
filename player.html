@@ -1,19 +1,109 @@
-    <div id="player" class="webtor" />
-    <script>
-        window.webtor = window.webtor || [];
-        window.webtor.push({
-            id: 'player',
-            magnet: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
-            poster: 'https://via.placeholder.com/150/0000FF/808080',
-            subtitles: [
-                {
-                    srclang: 'en',
-                    label: 'test',
-                    src: 'https://raw.githubusercontent.com/andreyvit/subtitle-tools/master/sample.srt',
-                    default: true,
-                }
-            ],
-            lang: 'en',
-        });
-    </script>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player de Torrent</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #loading {
+            font-size: 1.5rem;
+            margin: 20px;
+        }
+
+        #button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #e50914;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #button:hover {
+            background-color: #d40813;
+        }
+
+        #player {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            display: none;
+            margin: 20px auto;
+        }
+
+        #poster {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="poster" style="background-image: url('https://via.placeholder.com/800x450?text=Carregando+Poster');"></div>
+    <div id="loading">Carregando player...</div>
+    <button id="button">Reproduzir</button>
+    <div id="player"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
+    <script>
+        const magnetLink = new URLSearchParams(window.location.search).get('magnet') || 
+            'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel';
+        const posterURL = new URLSearchParams(window.location.search).get('poster') || 
+            'https://via.placeholder.com/800x450?text=Carregando+Poster';
+
+        const button = document.getElementById('button');
+        const player = document.getElementById('player');
+        const loading = document.getElementById('loading');
+        const poster = document.getElementById('poster');
+
+        player.style.display = 'none';
+        loading.style.display = 'none';
+
+        // Atualiza o poster dinâmico
+        poster.style.backgroundImage = `url('${posterURL}')`;
+
+        button.addEventListener('click', function () {
+            button.style.display = 'none';
+            loading.style.display = 'block';
+            poster.style.display = 'none';
+            initPlayer();
+        });
+
+        function initPlayer() {
+            window.webtor = window.webtor || [];
+            window.webtor.push({
+                id: 'player',
+                width: '100%',
+                magnet: magnetLink,
+                on: function (e) {
+                    if (e.name == window.webtor.INITED) {
+                        e.player.play();
+                        player.style.display = 'block';
+                        loading.style.display = 'none';
+                    }
+                },
+            });
+        }
+    </script>
+
+</body>
+
+</html>
