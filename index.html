@@ -11,17 +11,19 @@
             overflow: hidden;
             height: 100%;
         }
-        
+
         #player {
             height: 100vh;
             width: 100%;
         }
-        
+
         #imagem-topo {
             position: absolute;
             top: 10px;
             right: 10px;
+            opacity: 0;
             transition: opacity 1s ease-out;
+            display: none;
         }
 
         @media (max-width: 600px) {
@@ -33,27 +35,31 @@
     </style>
 </head>
 <body>
-    <div id="player"></div>
+    <div id="player" class="webtor"></div>
     <a id="imagem-topo-link" href="https://makingoff.eu.org/">
         <img id="imagem-topo" src="https://i.imgur.com/1inVaQD.png" alt="MakingOff Filmes">
     </a>
 
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
     <script>
+        // Função para obter parâmetros da URL
         function getQueryStringParameter(name) {
             const params = new URLSearchParams(window.location.search);
             return params.get(name);
         }
 
+        // Variáveis principais
         const movieId = getQueryStringParameter('id');
         const imdbId = getQueryStringParameter('imdb_id');
         const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
 
+        // Validação do ID do filme
         if (!movieId) {
             console.error('ID do filme não encontrado na URL');
         } else {
             let posterUrl = defaultPoster;
 
+            // Obter poster via API YTS, caso o IMDB seja fornecido
             if (imdbId) {
                 fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
                     .then(response => response.json())
@@ -70,43 +76,26 @@
             }
         }
 
+        // Inicialização do Player
         function initializePlayer(movieId, posterUrl) {
             window.webtor = window.webtor || [];
             window.webtor.push({
                 id: 'player',
                 magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
                 poster: posterUrl,
-                width: '100%',
-                height: '100%',
-                features: {
-                    autoSubtitles: true,
-                    continue: true,
-                    title: false,
-                    p2pProgress: true,
-                    subtitles: true,
-                    settings: false,
-                    embed: false,
-                    browse: false,
-                    download: false,
-                    fullscreen: true,
-                    playpause: true,
-                    currentTime: true,
-                    timeline: true,
-                    duration: true,
-                    volume: true,
-                    chromecast: true,
-                },
-                on: function(e) {
-                    if (e.name == window.webtor.TORRENT_FETCHED) {
-                        console.log('Torrent fetched!', e.data);
-                    }
-                    if (e.name == window.webtor.TORRENT_ERROR) {
-                        console.log('Torrent error!');
-                    }
-                },
+                subtitles: [
+                    {
+                        srclang: 'en',
+                        label: 'English',
+                        src: 'https://raw.githubusercontent.com/andreyvit/subtitle-tools/master/sample.srt',
+                        default: true,
+                    },
+                ],
+                lang: 'en',
             });
         }
 
+        // Funções para exibir e esconder a imagem no topo
         function hideImage() {
             const img = document.getElementById('imagem-topo');
             img.style.opacity = '0';
@@ -126,6 +115,7 @@
             hideImageTimeout = setTimeout(hideImage, 5000);
         }
 
+        // Configuração para exibição dinâmica da imagem
         let hideImageTimeout;
         document.addEventListener('mousemove', () => {
             showImage();
