@@ -8,91 +8,96 @@
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
             background-color: #000;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        #loading {
-            font-size: 1.5rem;
-            margin: 20px;
-        }
-
-        #button {
-            padding: 10px 20px;
-            font-size: 1rem;
-            background-color: #e50914;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #button:hover {
-            background-color: #d40813;
-        }
-
-        #player {
-            width: 100%;
-            max-width: 800px;
-            height: 450px;
-            display: none;
-            margin: 20px auto;
+            overflow: hidden;
         }
 
         #poster {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 800px;
-            height: 450px;
+            height: 100%;
             background-size: cover;
             background-position: center;
+            z-index: 1;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: white;
+            z-index: 2;
+        }
+
+        #player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 3;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="poster" style="background-image: url('https://via.placeholder.com/800x450?text=Carregando+Poster');"></div>
+    <div id="poster" style="background-image: url('https://i.imgur.com/IG0AIMf.jpeg');"></div>
     <div id="loading">Carregando player...</div>
-    <button id="button">Reproduzir</button>
     <div id="player"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
     <script>
-        const magnetLink = new URLSearchParams(window.location.search).get('magnet') || 
-            'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel';
-        const posterURL = new URLSearchParams(window.location.search).get('poster') || 
-            'https://via.placeholder.com/800x450?text=Carregando+Poster';
+        function getQueryStringParameter(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
 
-        const button = document.getElementById('button');
-        const player = document.getElementById('player');
-        const loading = document.getElementById('loading');
-        const poster = document.getElementById('poster');
+        const movieId = getQueryStringParameter('id');
+        const imdbId = getQueryStringParameter('imdb_id');
+        const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
 
-        player.style.display = 'none';
-        loading.style.display = 'none';
+        if (!movieId) {
+            console.error('ID do filme não encontrado na URL');
+        } else {
+            let posterUrl = defaultPoster;
 
-        // Atualiza o poster dinâmico
-        poster.style.backgroundImage = `url('${posterURL}')`;
+            if (imdbId) {
+                fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        posterUrl = data.data.movie.background_image || defaultPoster;
+                        initializePlayer(movieId, posterUrl);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar imagem de fundo:', error);
+                        initializePlayer(movieId, posterUrl);
+                    });
+            } else {
+                initializePlayer(movieId, posterUrl);
+            }
+        }
 
-        button.addEventListener('click', function () {
-            button.style.display = 'none';
-            loading.style.display = 'block';
-            poster.style.display = 'none';
-            initPlayer();
-        });
+        function initializePlayer(movieId, posterUrl) {
+            const player = document.getElementById('player');
+            const poster = document.getElementById('poster');
+            const loading = document.getElementById('loading');
 
-        function initPlayer() {
+            // Atualiza o poster de fundo
+            poster.style.backgroundImage = `url('${posterUrl}')`;
+
+            // Inicializa o player Webtor
             window.webtor = window.webtor || [];
             window.webtor.push({
                 id: 'player',
                 width: '100%',
-                magnet: magnetLink,
+                height: '100%',
+                magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
                 features: {
                     autoSubtitles: true,
                     continue: true,
@@ -115,6 +120,7 @@
                     if (e.name == window.webtor.INITED) {
                         e.player.play();
                         player.style.display = 'block';
+                        poster.style.display = 'none';
                         loading.style.display = 'none';
                     }
                 },
