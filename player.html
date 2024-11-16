@@ -93,6 +93,24 @@
                 id: 'player',
                 width: '100%',
                 magnet: magnetLink,
+                features: {
+                    autoSubtitles: true,
+                    continue: true,
+                    title: false,
+                    p2pProgress: true,
+                    subtitles: true,
+                    settings: false,
+                    embed: false,
+                    browse: false,
+                    download: false,
+                    fullscreen: true,
+                    playpause: true,
+                    currentTime: true,
+                    timeline: true,
+                    duration: true,
+                    volume: true,
+                    chromecast: true,
+                },
                 on: function (e) {
                     if (e.name == window.webtor.INITED) {
                         e.player.play();
