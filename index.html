@@ -13,8 +13,11 @@
         }
 
         #player {
-            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
         }
 
         #imagem-topo {
@@ -83,15 +86,32 @@
                 id: 'player',
                 magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
                 poster: posterUrl,
-                subtitles: [
-                    {
-                        srclang: 'en',
-                        label: 'English',
-                        src: 'https://raw.githubusercontent.com/andreyvit/subtitle-tools/master/sample.srt',
-                        default: true,
-                    },
-                ],
-                lang: 'en',
+                features: {
+                    autoSubtitles: true,
+                    continue: true,
+                    title: false,
+                    p2pProgress: true,
+                    subtitles: true,
+                    settings: false,
+                    embed: false,
+                    browse: false,
+                    download: false,
+                    fullscreen: true,
+                    playpause: true,
+                    currentTime: true,
+                    timeline: true,
+                    duration: true,
+                    volume: true,
+                    chromecast: true,
+                },
+                on: function(e) {
+                    if (e.name == window.webtor.TORRENT_FETCHED) {
+                        console.log('Torrent fetched!', e.data);
+                    }
+                    if (e.name == window.webtor.TORRENT_ERROR) {
+                        console.log('Torrent error!');
+                    }
+                },
             });
         }
 
