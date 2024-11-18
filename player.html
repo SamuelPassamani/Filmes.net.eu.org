@@ -15,44 +15,10 @@
             height: 100%;
         }
     </style>
-        <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
 </head>
-
 <body>
-    <div id="player"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const playerDiv = document.getElementById('player');
-
-            // Inserindo o Webtor player no div do player
-            WebtorSDK.Player.create({
-                id: 'player',
-                magnet: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel',
-                width: '100%',
-                height: '100%',
-                features: {
-                    autoSubtitles: true,
-                    continue: true,
-                    title: false,
-                    p2pProgress: true,
-                    subtitles: true,
-                    settings: false,
-                    embed: false,
-                    browse: false,
-                    download: false,
-                    fullscreen: true,
-                    playpause: true,
-                    currentTime: true,
-                    timeline: true,
-                    duration: true,
-                    volume: true,
-                    chromecast: true,
-                },
-                parent: playerDiv // Define o elemento onde o player será embutido
-            });
-        });
-    </script>
+    <video src="magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel" controls width="100%" height="100%" data-title="Sintel"></video>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script> -->
 </body>
-
 </html>
