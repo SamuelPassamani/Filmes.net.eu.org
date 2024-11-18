@@ -15,14 +15,17 @@
             height: 100%;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
 </head>
 
 <body>
     <div id="player"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const player = new WebtorSDK.Player({
+            const playerDiv = document.getElementById('player');
+
+            // Inserindo o Webtor player no div do player
+            WebtorSDK.Player.create({
                 id: 'player',
                 magnet: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel',
                 width: '100%',
@@ -44,7 +47,8 @@
                     duration: true,
                     volume: true,
                     chromecast: true,
-                }
+                },
+                parent: playerDiv // Define o elemento onde o player será embutido
             });
         });
     </script>
