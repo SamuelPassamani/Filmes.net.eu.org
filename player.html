@@ -1,167 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Webtor Player</title>
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
+    <title>Webtor Player SDK Fullscreen</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
     <style>
-        body {
+        html, body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-        }
-
-        #player-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-        }
-
-        #poster {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            z-index: 1;
-            display: none;
         }
 
         #player {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            z-index: 2;
-        }
-
-        #controls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 3;
-        }
-
-        .control-btn {
-            background: #333;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            color: #fff;
-            font-size: 16px;
-        }
-
-        .control-btn:hover {
-            background: #555;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            background: #000;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
 </head>
 
 <body>
-    <div id="player-container">
-        <img id="poster" src="" alt="Poster">
-        <div id="player"></div>
-        <div id="controls">
-            <button class="control-btn" id="play-btn">Play</button>
-            <button class="control-btn" id="pause-btn">Pause</button>
-            <button class="control-btn" id="restart-btn">Restart</button>
-        </div>
-    </div>
-
+    <div id="player"></div>
     <script>
-        function getQueryStringParameter(name) {
-            const params = new URLSearchParams(window.location.search);
-            return params.get(name);
-        }
-
-        const hash = getQueryStringParameter('hash');
-        const imdbId = getQueryStringParameter('imdb_id');
-        const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
-
-        if (!hash) {
-            console.error('Magnet hash não encontrado na URL');
-        } else {
-            let posterUrl = defaultPoster;
-
-            if (imdbId) {
-                fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        posterUrl = data.data.movie.large_cover_image || defaultPoster;
-                        initializePlayer(hash, posterUrl);
-                    })
-                    .catch(error => {
-                        console.error('Erro ao buscar imagem do filme:', error);
-                        initializePlayer(hash, posterUrl);
-                    });
-            } else {
-                initializePlayer(hash, posterUrl);
-            }
-        }
-
-        function initializePlayer(hash, posterUrl) {
-            const poster = document.getElementById('poster');
-            const playerElement = document.getElementById('player');
-            poster.src = posterUrl;
-            poster.style.display = 'block';
-
-            window.webtor = window.webtor || [];
-            window.webtor.push({
-                id: 'player',
-                magnet: `magnet:?xt=urn:btih:${hash}`,
-                width: '100%',
-                height: '100%',
-                features: {
-                    autoSubtitles: true,
-                    continue: true,
-                    fullscreen: true,
-                    playpause: true,
-                    currentTime: true,
-                    timeline: true,
-                    duration: true,
-                    volume: true,
-                },
-                on: function (e) {
-                    if (e.name === window.webtor.INITED) {
-                        poster.style.display = 'none';
-                    }
-                },
-            });
-
-            setupControls();
-        }
-
-        function setupControls() {
-            const playBtn = document.getElementById('play-btn');
-            const pauseBtn = document.getElementById('pause-btn');
-            const restartBtn = document.getElementById('restart-btn');
-
-            playBtn.addEventListener('click', () => {
-                const webtorPlayer = document.getElementById('player').webtor;
-                if (webtorPlayer) webtorPlayer.play();
-            });
-
-            pauseBtn.addEventListener('click', () => {
-                const webtorPlayer = document.getElementById('player').webtor;
-                if (webtorPlayer) webtorPlayer.pause();
-            });
-
-            restartBtn.addEventListener('click', () => {
-                const webtorPlayer = document.getElementById('player').webtor;
-                if (webtorPlayer) webtorPlayer.setPosition(0);
-            });
-        }
+        var el = document.getElementById('player');
+        window.webtor = window.webtor || [];
+        window.webtor.push({
+            id: 'player',
+            magnet: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel',
+            title: 'Example Movie',
+            subtitles: [],
+            width: '100%',
+            height: '100%',
+            features: {
+                autoSubtitles: true,
+                settings: false,
+            },
+            on: function(e) {
+                if (e.name == window.webtor.TORRENT_ERROR) {
+                    console.error('Torrent error!');
+                }
+            },
+        });
     </script>
 </body>
 
