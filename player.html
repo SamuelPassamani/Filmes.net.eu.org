@@ -1,55 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 
 <head>
-    <title>Webtor Player Fullscreen</title>
     <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <meta content="ie=edge" http-equiv="x-ua-compatible">
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        #player {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000;
-            z-index: 1;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
+    <meta name="viewport" content="width=device-width">
 </head>
 
 <body>
+
+    <div id="loading">Loading...</div>
+    <button id="button">Play</button>
     <div id="player"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
     <script>
-        window.webtor = window.webtor || [];
-        window.webtor.push({
-            id: 'player',
-            magnet: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel',
-            title: 'Example Movie',
-            subtitles: [],
-            width: '100%',
-            height: '100%',
-            features: {
-                autoSubtitles: true,
-                settings: false,
-            },
-            on: function(e) {
-                if (e.name == window.webtor.TORRENT_ERROR) {
-                    console.error('Torrent error!');
-                }
-            },
+        var button = document.getElementById('button');
+        var player = document.getElementById('player');
+        var loading = document.getElementById('loading');
+        player.style.display = 'none';
+        loading.style.display = 'none';
+
+        button.addEventListener('click', function () {
+            button.style.display = 'none';
+            loading.style.display = 'block';
+            initPlayer();
         });
+
+        function initPlayer() {
+            window.webtor = window.webtor || [];
+            window.webtor.push({
+                id: 'player',
+                width: '100%',
+                magnet: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel',
+                on: function (e) {
+                    if (e.name == window.webtor.INITED) {
+                        e.player.play();
+                        player.style.display = 'block';
+                        loading.style.display = 'none';
+                    }
+                },
+            });
+        }
+
+
     </script>
 </body>
-
 </html>
