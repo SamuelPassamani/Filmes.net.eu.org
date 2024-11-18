@@ -1,155 +1,167 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <title>Webtor Player SDK Example</title>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Webtor Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
     <style>
-        html, body {
+        body {
             margin: 0;
             padding: 0;
             overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+        }
+
+        #player-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+
+        #poster {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            display: none;
         }
+
         #player {
-            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            z-index: 2;
         }
+
         #controls {
-            padding: 1rem;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 3;
         }
-        #controls i {
-            padding-top: 0.3rem;
-            display: block;
+
+        .control-btn {
+            background: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
         }
-        .control {
-            padding-right: 1rem;
-        }
-        #files {
-            padding: 0.5rem;
-        }
-        #files a {
-            padding: 0.5rem;
+
+        .control-btn:hover {
+            background: #555;
         }
     </style>
-    <!-- <script src="../../dist/index.min.js" charset="utf-8" async></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
 </head>
 
 <body>
-    <div id="controls">
-        <span class="control">
-            External controls*: 
-            <button id="play">Play</button>
-            <button id="pause">Pause</button>
-            <button id="moveto1min">Move to 1 min</button>
-            <button id="movetostart">Move to start</button>
-        </span>
-        <span class="control">
-            Player status: <span id="player-status">NONE</span>
-        </span>
-        <span class="control">
-            Current time: <span id="current-time">0</span> sec
-        </span>
-        <span class="duration">
-            Duration: <span id="duration">0</span> sec
-        </span>
-        <br />
-        <i>* - works only after first click on play button in the player</i>
+    <div id="player-container">
+        <img id="poster" src="" alt="Poster">
+        <div id="player"></div>
+        <div id="controls">
+            <button class="control-btn" id="play-btn">Play</button>
+            <button class="control-btn" id="pause-btn">Pause</button>
+            <button class="control-btn" id="restart-btn">Restart</button>
+        </div>
     </div>
-    <div id="player"></div>
-    <div id="files"></div> 
-    <script>
-        var el = document.getElementById('player');
-        window.webtor = window.webtor || [];
-        window.webtor.push({
-            id: 'player',
-            // baseUrl: 'https://webtor.io',
-            // baseUrl: 'http://192.168.0.100:4000',
-            magnet: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel',
-            title: 'Example Movie',
-            subtitles: [
-                // {
-                //     srclang: 'en',
-                //     label: 'SHQIP',
-                //     src: 'https://dl.dropboxusercontent.com/s/afsiiiw705h3vkk/Ava.2020.HDRip.srt?dl=0',
-                //     default: true,
-                // },
-            ],
-            width: '100%',
-            height: '100%',
-            features: {
-                autoSubtitles: true,
-                continue:      true,
-                // title:       false,
-                p2pProgress: true,
-                subtitles:   false,
-                settings:      false,
-                fullscreen:  true,
-                playpause:   true,
-                currentTime: true,
-                timeline:    true,
-                duration:    true,
-                volume:      true,
-                chromecast:  true,
-            },
-            on: function(e) {
-                if (e.name == window.webtor.TORRENT_FETCHED) {
-                    console.log('Torrent fetched!', e.data.files);
 
-                    var p = e.player;
-                    var files = document.getElementById('files');
-                    for (const f of e.data.files) {
-                        if (!f.name.endsWith('.mp4')) continue;
-                        var a = document.createElement('a');
-                        a.setAttribute('href', f.path);
-                        a.innerText = f.name;
-                        files.appendChild(a);
-                        a.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            p.open(e.target.getAttribute('href'));
-                            return false;
-                        });
+    <script>
+        function getQueryStringParameter(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        const hash = getQueryStringParameter('hash');
+        const imdbId = getQueryStringParameter('imdb_id');
+        const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
+
+        if (!hash) {
+            console.error('Magnet hash não encontrado na URL');
+        } else {
+            let posterUrl = defaultPoster;
+
+            if (imdbId) {
+                fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        posterUrl = data.data.movie.large_cover_image || defaultPoster;
+                        initializePlayer(hash, posterUrl);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar imagem do filme:', error);
+                        initializePlayer(hash, posterUrl);
+                    });
+            } else {
+                initializePlayer(hash, posterUrl);
+            }
+        }
+
+        function initializePlayer(hash, posterUrl) {
+            const poster = document.getElementById('poster');
+            const playerElement = document.getElementById('player');
+            poster.src = posterUrl;
+            poster.style.display = 'block';
+
+            window.webtor = window.webtor || [];
+            window.webtor.push({
+                id: 'player',
+                magnet: `magnet:?xt=urn:btih:${hash}`,
+                width: '100%',
+                height: '100%',
+                features: {
+                    autoSubtitles: true,
+                    continue: true,
+                    fullscreen: true,
+                    playpause: true,
+                    currentTime: true,
+                    timeline: true,
+                    duration: true,
+                    volume: true,
+                },
+                on: function (e) {
+                    if (e.name === window.webtor.INITED) {
+                        poster.style.display = 'none';
                     }
-                }
-                if (e.name == window.webtor.TORRENT_ERROR) {
-                    console.log('Torrent error!')
-                }
-                if (e.name == window.webtor.INITED) {
-                    var p = e.player;
-                    document.getElementById('play').addEventListener('click', function(ev) {
-                        p.play();
-                    });
-                    document.getElementById('pause').addEventListener('click', function(ev) {
-                        p.pause();
-                    });
-                    document.getElementById('moveto1min').addEventListener('click', function(ev) {
-                        p.setPosition(60);
-                    });
-                    document.getElementById('movetostart').addEventListener('click', function(ev) {
-                        p.setPosition(0);
-                    });
-                }
-                if (e.name == window.webtor.PLAYER_STATUS) {
-                    document.getElementById('player-status').innerHTML = e.data;
-                }
-                if (e.name == window.webtor.OPEN) {
-                    console.log(e.data);
-                }
-                if (e.name == window.webtor.CURRENT_TIME) {
-                    document.getElementById('current-time').innerHTML = parseInt(e.data);
-                }
-                if (e.name == window.webtor.DURATION) {
-                    document.getElementById('duration').innerHTML = parseInt(e.data);
-                }
-                if (e.name == window.webtor.OPEN_SUBTITLES) {
-                    console.log(e.data);
-                }
-            },
-        });
+                },
+            });
+
+            setupControls();
+        }
+
+        function setupControls() {
+            const playBtn = document.getElementById('play-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const restartBtn = document.getElementById('restart-btn');
+
+            playBtn.addEventListener('click', () => {
+                const webtorPlayer = document.getElementById('player').webtor;
+                if (webtorPlayer) webtorPlayer.play();
+            });
+
+            pauseBtn.addEventListener('click', () => {
+                const webtorPlayer = document.getElementById('player').webtor;
+                if (webtorPlayer) webtorPlayer.pause();
+            });
+
+            restartBtn.addEventListener('click', () => {
+                const webtorPlayer = document.getElementById('player').webtor;
+                if (webtorPlayer) webtorPlayer.setPosition(0);
+            });
+        }
     </script>
 </body>
 
