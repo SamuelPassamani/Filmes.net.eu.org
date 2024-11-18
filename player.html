@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Webtor Player SDK Fullscreen</title>
+    <title>Webtor Player Fullscreen</title>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <meta content="ie=edge" http-equiv="x-ua-compatible">
@@ -10,19 +10,19 @@
         html, body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
             width: 100%;
             height: 100%;
+            overflow: hidden;
         }
 
         #player {
-            width: 100%;
-            height: 100%;
             position: fixed;
             top: 0;
             left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
             z-index: 1;
-            background: #000;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
@@ -31,7 +31,6 @@
 <body>
     <div id="player"></div>
     <script>
-        var el = document.getElementById('player');
         window.webtor = window.webtor || [];
         window.webtor.push({
             id: 'player',
