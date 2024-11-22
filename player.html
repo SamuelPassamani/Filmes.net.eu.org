@@ -1,19 +1,136 @@
-    <div id="player" class="webtor" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmes.net.eu.org / Torrent Player</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        #player {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        #imagem-topo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            #imagem-topo {
+                top: 5px;
+                right: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="player" class="webtor"></div>
+    <a id="imagem-topo-link" href="https://makingoff.eu.org/">
+        <img id="imagem-topo" src="https://i.imgur.com/1inVaQD.png" alt="MakingOff Filmes">
+    </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
     <script>
-        window.webtor = window.webtor || [];
-        window.webtor.push({
-            id: 'player',
-            magnet: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
-            poster: 'https://via.placeholder.com/150/0000FF/808080',
-            subtitles: [
-                {
-                    srclang: 'en',
-                    label: 'test',
-                    src: 'https://raw.githubusercontent.com/andreyvit/subtitle-tools/master/sample.srt',
-                    default: true,
-                }
-            ],
-            lang: 'en',
+        // Função para obter parâmetros da URL
+        function getQueryStringParameter(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        // Variáveis principais
+        const movieId = getQueryStringParameter('id');
+        const imdbId = getQueryStringParameter('imdb_id');
+        const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
+
+        // Validação do ID do filme
+        if (!movieId) {
+            console.error('ID do filme não encontrado na URL');
+        } else {
+            let posterUrl = defaultPoster;
+
+            // Obter poster via API YTS, caso o IMDB seja fornecido
+            if (imdbId) {
+                fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        posterUrl = data.data.movie.background_image || defaultPoster;
+                        initializePlayer(movieId, posterUrl);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar imagem de fundo:', error);
+                        initializePlayer(movieId, posterUrl);
+                    });
+            } else {
+                initializePlayer(movieId, posterUrl);
+            }
+        }
+
+        // Inicialização do Player
+        function initializePlayer(movieId, posterUrl) {
+            window.webtor = window.webtor || [];
+            window.webtor.push({
+                id: 'player',
+                magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
+                poster: posterUrl,
+                width: '100%',
+                height: '100%',
+                imdbId: '${imdbId}',
+                features: {
+                    autoSubtitles: true,
+                    continue: true,
+                    title: false,
+                    p2pProgress: true,
+                    subtitles: true,
+                    settings: false,
+                    embed: false,
+                    browse: false,
+                    download: false,
+                    fullscreen: true,
+                    playpause: true,
+                    currentTime: true,
+                    timeline: true,
+                    duration: true,
+                    volume: true,
+                    chromecast: true,
+                },
+                on: function(e) {
+                    if (e.name == window.webtor.TORRENT_FETCHED) {
+                        console.log('Torrent fetched!', e.data);
+                    }
+                    if (e.name == window.webtor.TORRENT_ERROR) {
+                        console.log('Torrent error!');
+                    }
+                },
+            });
+        }
+
+        // Exibição da imagem no topo
+        function showImage() {
+            const img = document.getElementById('imagem-topo');
+            img.style.display = 'block';
+            setTimeout(() => {
+                img.style.opacity = '1';
+            }, 10);
+        }
+
+        // Configuração para exibição da imagem
+        document.addEventListener('mousemove', () => {
+            showImage();
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
+</body>
+</html>
