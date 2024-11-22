@@ -38,99 +38,85 @@
     </style>
 </head>
 <body>
-    <div id="player" class="webtor"></div>
-    <a id="imagem-topo-link" href="https://makingoff.eu.org/">
-        <img id="imagem-topo" src="https://i.imgur.com/1inVaQD.png" alt="MakingOff Filmes">
-    </a>
+<div id="player" class="webtor"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
-    <script>
-        // Função para obter parâmetros da URL
-        function getQueryStringParameter(name) {
-            const params = new URLSearchParams(window.location.search);
-            return params.get(name);
-        }
+<script>
+// Função para obter parâmetros da URL
+function getQueryStringParameter(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+}
 
-        // Variáveis principais
-        const movieId = getQueryStringParameter('id');
-        const imdbId = getQueryStringParameter('imdb_id');
-        const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
+// Variáveis principais
+const movieId = getQueryStringParameter('id');
+const imdbId = getQueryStringParameter('imdb_id');
+const defaultPoster = 'https://i.imgur.com/IG0AIMf.jpeg';
 
-        // Validação do ID do filme
-        if (!movieId) {
-            console.error('ID do filme não encontrado na URL');
-        } else {
-            let posterUrl = defaultPoster;
+// Validação do ID do filme
+if (!movieId) {
+    console.error('ID do filme não encontrado na URL');
+} else {
+    let posterUrl = defaultPoster;
 
-            // Obter poster via API YTS, caso o IMDB seja fornecido
-            if (imdbId) {
-                fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        posterUrl = data.data.movie.background_image || defaultPoster;
-                        initializePlayer(movieId, posterUrl);
-                    })
-                    .catch(error => {
-                        console.error('Erro ao buscar imagem de fundo:', error);
-                        initializePlayer(movieId, posterUrl);
-                    });
-            } else {
-                initializePlayer(movieId, posterUrl);
-            }
-        }
-
-        // Inicialização do Player
-        function initializePlayer(movieId, posterUrl) {
-            window.webtor = window.webtor || [];
-            window.webtor.push({
-                id: 'player',
-                magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
-                poster: posterUrl,
-                width: '100%',
-                height: '100%',
-                imdbId: '${imdbId}',
-                features: {
-                    autoSubtitles: true,
-                    continue: true,
-                    title: false,
-                    p2pProgress: true,
-                    subtitles: true,
-                    settings: false,
-                    embed: false,
-                    browse: false,
-                    download: false,
-                    fullscreen: true,
-                    playpause: true,
-                    currentTime: true,
-                    timeline: true,
-                    duration: true,
-                    volume: true,
-                    chromecast: true,
-                },
-                on: function(e) {
-                    if (e.name == window.webtor.TORRENT_FETCHED) {
-                        console.log('Torrent fetched!', e.data);
-                    }
-                    if (e.name == window.webtor.TORRENT_ERROR) {
-                        console.log('Torrent error!');
-                    }
-                },
+    // Obter poster via API YTS, caso o IMDB seja fornecido
+    if (imdbId) {
+        fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
+            .then(response => response.json())
+            .then(data => {
+                posterUrl = data.data.movie.background_image || defaultPoster;
+                initializePlayer(movieId, posterUrl, imdbId);
+            })
+            .catch(error => {
+                console.error('Erro ao buscar imagem de fundo:', error);
+                initializePlayer(movieId, posterUrl, imdbId);
             });
-        }
+    } else {
+        initializePlayer(movieId, posterUrl, imdbId);
+    }
+}
 
-        // Exibição da imagem no topo
-        function showImage() {
-            const img = document.getElementById('imagem-topo');
-            img.style.display = 'block';
-            setTimeout(() => {
-                img.style.opacity = '1';
-            }, 10);
-        }
+// Inicialização do Player
+function initializePlayer(movieId, posterUrl, imdbId) {
+    window.webtor = window.webtor || [];
+    window.webtor.push({
+        id: 'player',
+        magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
+        poster: posterUrl,
+        width: '100%',
+        height: '100%',
+        imdbId: imdbId,
+        features: {
+            autoSubtitles: true,
+            continue: true,
+            title: false,
+            p2pProgress: true,
+            subtitles: true,
+            settings: false,
+            embed: false,
+            browse: false,
+            download: false,
+            fullscreen: true,
+            playpause: true,
+            currentTime: true,
+            timeline: true,
+            duration: true,
+            volume: true,
+            chromecast: true,
+        },
+        on: function(e) {
+            if (e.name == window.webtor.TORRENT_FETCHED) {
+                console.log('Torrent fetched!', e.data);
+            }
+            if (e.name == window.webtor.TORRENT_ERROR) {
+                console.log('Torrent error!');
+            }
+        },
+    });
+}
+</script>
 
-        // Configuração para exibição da imagem
-        document.addEventListener('mousemove', () => {
-            showImage();
-        });
+<script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
+
     </script>
 </body>
 </html>
