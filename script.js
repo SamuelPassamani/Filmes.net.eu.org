@@ -1,67 +1,73 @@
-// Referências aos elementos HTML
-var player = document.getElementById("player");
-var loading = document.getElementById("loading");
+// Função para obter parâmetros da URL
+function getQueryStringParameter(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
 
-// Esconde o player inicialmente e exibe a mensagem de carregamento
-player.style.display = "none";
-loading.style.display = "block";
+// Variáveis principais
+const movieId = getQueryStringParameter("hash");
+const imdbId = getQueryStringParameter("id");
+const defaultPoster = "https://i.imgur.com/IG0AIMf.jpeg";
 
-// Inicia o player assim que a página é carregada
-window.onload = function () {
-  initPlayer();
-};
+// Validação do ID do filme
+if (!movieId) {
+  console.error("ID do filme não encontrado na URL");
+} else {
+  let posterUrl = defaultPoster;
 
-// Função para inicializar o player com Webtor
-function initPlayer() {
+  // Obter poster via API YTS, caso o IMDB seja fornecido
+  if (imdbId) {
+    fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        posterUrl = data.data.movie.background_image || defaultPoster;
+        initPlayer(movieId, posterUrl, imdbId);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar imagem de fundo:", error);
+        initPlayer(movieId, posterUrl, imdbId);
+      });
+  } else {
+    initPlayer(movieId, posterUrl, imdbId);
+  }
+}
+
+// Inicialização do Player
+function initPlayer(movieId, posterUrl, imdbId) {
   window.webtor = window.webtor || [];
   window.webtor.push({
-    id: "player", // ID do contêiner do player
+    id: "player",
+    magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
+    poster: posterUrl,
     width: "100%",
+    imdbId: imdbId,
     lang: "pt",
     userLang: "pt",
-    magnet:
-      "magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel", // Link do torrent
     features: {
-      autoSubtitles: true, // Ativar legendas automáticas
-      continue: true, // Continuar de onde parou
-      title: false, // Ocultar título
-      p2pProgress: false, // Desativar progresso P2P
-      subtitles: true, // Exibir opção de legendas
-      settings: false, // Ocultar configurações
-      fullscreen: true, // Habilitar fullscreen
-      playpause: true, // Mostrar botão de play/pause
-      currentTime: true, // Mostrar tempo atual
-      timeline: true, // Exibir timeline
-      duration: true, // Mostrar duração
-      volume: true, // Permitir controle de volume
-      chromecast: true, // Ativar suporte ao Chromecast
-      embed: false // Desativar opção de incorporar
+      autoSubtitles: true,
+      continue: true,
+      title: false,
+      p2pProgress: true,
+      subtitles: true,
+      settings: false,
+      embed: true,
+      browse: false,
+      download: true,
+      fullscreen: true,
+      playpause: true,
+      currentTime: true,
+      timeline: true,
+      duration: true,
+      volume: true,
+      chromecast: true
     },
-    // Callback para eventos do player
     on: function (e) {
-      if (e.name === window.webtor.INITED) {
-        e.player.play(); // Inicia a reprodução automaticamente
-        player.style.display = "block"; // Exibe o player
-        loading.style.display = "none"; // Esconde a mensagem de carregamento
+      if (e.name == window.webtor.TORRENT_FETCHED) {
+        console.log("Torrent fetched!", e.data);
       }
-      // Detecta quando o fullscreen é ativado ou desativado
-      if (e.name === window.webtor.FULLSCREEN) {
-        handleFullscreen(e.isFullscreen);
+      if (e.name == window.webtor.TORRENT_ERROR) {
+        console.log("Torrent error!");
       }
     }
   });
-}
-
-// Função para gerenciar a exibição da imagem no modo fullscreen
-function handleFullscreen(isFullscreen) {
-  const imagemTopo = document.getElementById("imagem-topo-link");
-
-  if (isFullscreen) {
-    // Adiciona a imagem ao contêiner do player ou ao fullscreenElement
-    const fullscreenElement = document.fullscreenElement || document.documentElement;
-    fullscreenElement.appendChild(imagemTopo);
-  } else {
-    // Retorna a imagem ao corpo do documento
-    document.body.appendChild(imagemTopo);
-  }
 }
