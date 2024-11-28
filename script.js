@@ -5,8 +5,8 @@ function getQueryStringParameter(name) {
 }
 
 // Variáveis principais
-const movieId = getQueryStringParameter("hash");
-const imdbId = getQueryStringParameter("id");
+const movieId = getQueryStringParameter("id");
+const imdbId = getQueryStringParameter("imdb");
 const defaultPoster = "https://i.imgur.com/IG0AIMf.jpeg";
 
 // Validação do ID do filme
