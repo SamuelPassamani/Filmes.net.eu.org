@@ -5,11 +5,13 @@ body {
   overflow: auto;
   height: 100%;
 }
+
 #player {
-  height: 100%;
-  width: 100%;
-  display: inline-block;
-  position: absolute;
+    display: inline-block;
+    width: 80vw;   /* 80% da largura da viewport */
+    height: 45vw;  /* Altura proporcional para vídeo (16:9) */
+    max-width: 1200px; /* Limita o tamanho máximo */
+    background-color: black;
 }
 
 #imagem-topo-link {
