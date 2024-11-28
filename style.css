@@ -8,8 +8,7 @@ body {
 #player {
   height: 100vh;
   width: 100%;
-  flex-grow: 1;
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: center;
   position: relative;
