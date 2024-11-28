@@ -9,7 +9,7 @@ body {
   height: 80%;
   width: 100%;
   display: inline;
-  position: fixed;
+  position: absolute;
 }
 
 #imagem-topo-link {
