@@ -40,7 +40,6 @@ function initPlayer(movieId, posterUrl, imdbId) {
     magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=`,
     poster: posterUrl,
     width: "100%",
-    height: "100%",
     imdbId: imdbId,
     lang: "pt",
     userLang: "pt",
