@@ -6,11 +6,9 @@ body {
   height: 100%;
 }
 #player {
-  height: 100vh;
+  height: 100%;
   width: 100%;
   display: block;
-  justify-content: center;
-  align-items: center;
   position: relative;
 }
 
