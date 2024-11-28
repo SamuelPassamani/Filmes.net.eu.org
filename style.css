@@ -3,11 +3,11 @@ body {
   margin: 0;
   padding: 0;
   overflow: auto;
-  width: 100%;
   height: 100%;
 }
 #player {
-  position: absolute;
+  height: 100vh;
+  width: 100%;
 }
 
 #imagem-topo-link {
