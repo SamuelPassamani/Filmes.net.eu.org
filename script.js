@@ -1,75 +1,218 @@
-// Função para obter parâmetros da URL
-function getQueryStringParameter(name) {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name);
-}
+jQuery(document).ready(function ($) {
+    // Inicializando variáveis de controle de página
+    let currentPage = 1;
+    const moviesPerPage = 30;
 
-// Variáveis principais
-const movieId = getQueryStringParameter("id");
-const imdbId = getQueryStringParameter("imdb");
-const defaultPoster = "https://lh3.googleusercontent.com/d/1IP-lAqFygjiMHsOJ7dHZ11-hJc9_9Nhj?authuser=0";
+    // Parâmetros de filtragem adicionais
+    let quality = '';
+    let minimumRating = '';
+    let queryTerm = '';
+    let genre = '';
+    let sortBy = 'date_added'; // Padrão: filmes mais recentes
+    let orderBy = '';
 
-// Validação do ID do filme
-if (!movieId) {
-  console.error("ID do filme não encontrado na URL");
-} else {
-  let posterUrl = defaultPoster;
+    // Função para carregar filmes da API com parâmetros de filtragem
+    function loadMovies(page = 1) {
+        const apiUrl = `https://yts.mx/api/v2/list_movies.json?limit=${moviesPerPage}&page=${page}` +
+            (quality ? `&quality=${quality}` : '') +
+            (minimumRating ? `&minimum_rating=${minimumRating}` : '') +
+            (queryTerm ? `&query_term=${queryTerm}` : '') +
+            (genre ? `&genre=${genre}` : '') +
+            (sortBy ? `&sort_by=${sortBy}` : '') +
+            (orderBy ? `&order_by=${orderBy}` : '');
 
-  // Obter poster via API YTS, caso o IMDB seja fornecido
-  if (imdbId) {
-    fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        posterUrl = data.data.movie.background_image || defaultPoster;
-        initPlayer(movieId, posterUrl, imdbId);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar imagem de fundo:", error);
-        initPlayer(movieId, posterUrl, imdbId);
-      });
-  } else {
-    initPlayer(movieId, posterUrl, imdbId);
-  }
-}
+        $.get(apiUrl, function (response) {
+            if (response.data && response.data.movies) {
+                const movies = response.data.movies;
+                const movieList = $('.movie-list .list');
+                movieList.empty(); // Limpa a lista atual
 
-// Inicialização do Player
-function initPlayer(movieId, posterUrl, imdbId) {
-  window.webtor = window.webtor || [];
-  window.webtor.push({
-    id: "player",
-    magnet: `magnet:?xt=urn:btih:${movieId}&dn=${movieId}&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2F9.rarbg.to%3A2710%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.cyberia.is%3A6969%2Fannounce&tr=http%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.tracker.cl%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.bt4g.com%3A2095%2Fannounce&tr=udp%3A%2F%2Fbubu.mapfactor.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce&tr=https%3A%2F%2Ftrackers.mlsub.net%3A443%2Fannounce&tr=http%3A%2F%2Ftracker1.itzmx.com%3A8080%2Fannounce&tr=udp%3A%2F%2Fipv6.fuuuuuck.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.qu.ax%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.0x7c0.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fevan.im%3A6969%2Fannounce&tr=https%3A%2F%2Ftracker.yemekyedim.com%3A443%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=https%3A%2F%2Ftracker.lilithraws.org%3A443%2Fannounce&tr=udp%3A%2F%2Ftracker.fnix.net%3A6969%2Fannounce&tr=udp%3A%2F%2Famigacity.xyz%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.files.fm%3A6969%2Fannounce&tr=udp%3A%2F%2Fmoonburrow.club%3A6969%2Fannounce&tr=http%3A%2F%2Fbt.okmp3.ru%3A2710%2Fannounce&tr=http%3A%2F%2Fipv6.rer.lol%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.draatman.uk%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.renfei.net%3A8080%2Fannounce&tr=udp%3A%2F%2Fbt1.archive.org%3A6969%2Fannounce&tr=udp%3A%2F%2Foh.fuuuuuck.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fbt2.archive.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fec2-18-191-163-220.us-east-2.compute.amazonaws.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.darkness.services%3A6969%2Fannounce&tr=https%3A%2F%2Ftracker.tamersunion.org%3A443%2Fannounce&tr=https%3A%2F%2Ftracker.gcrenwp.top%3A443%2Fannounce&tr=udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fu.peer-exchange.download%3A6969%2Fannounce&tr=udp%3A%2F%2Fu6.trakx.crim.ist%3A1337%2Fannounce&tr=udp%3A%2F%2Fmartin-gebhardt.eu%3A25%2Fannounce&tr=udp%3A%2F%2Ftracker.tryhackx.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fwww.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftk2v6.trackerservers.com%3A8080%2Fannounce&tr=udp%3A%2F%2Ftracker.breizh.pm%3A6969%2Fannounce&tr=udp%3A%2F%2Fopen.dstud.io%3A6969%2Fannounce&tr=udp%3A%2F%2Fepider.me%3A6969%2Fannounce&tr=https%3A%2F%2Fwww.peckservers.com%3A9443%2Fannounce&tr=udp%3A%2F%2Fttk2.nbaonlineservice.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fretracker.lanta.me%3A2710%2Fannounce&tr=http%3A%2F%2Fbvarf.tracker.sh%3A2086%2Fannounce&tr=udp%3A%2F%2Fseedpeer.net%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.gmi.gd%3A6969%2Fannounce&tr=udp%3A%2F%2Ftk2.trackerservers.com%3A8080%2Fannounce&tr=udp%3A%2F%2Fretracker01-msk-virt.corbina.net%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.io%3A6969%2Fannounce&tr=udp%3A%2F%2Fopen.demonoid.ch%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.birkenwald.de%3A6969%2Fannounce&tr=http%3A%2F%2Fopen-v6.demonoid.ch%3A6969%2Fannounce&tr=udp%3A%2F%2Fu4.trakx.crim.ist%3A1337%2Fannounce&tr=udp%3A%2F%2Frun.publictracker.xyz%3A6969%2Fannounce&tr=udp%3A%2F%2Fopen-tracker.demonoid.ch%3A6969%2Fannounce&tr=https%3A%2F%2Ftrackers.run%3A443%2Fannounce&tr=http%3A%2F%2Ftracker.dump.cl%3A6969%2Fannounce&tr=udp%3A%2F%2Fp2p.publictracker.xyz%3A6969%2Fannounce&tr=udp%3A%2F%2Fodd-hd.fr%3A6969%2Fannounce&tr=https%3A%2F%2Ftracker.cloudit.top%3A443%2Fannounce&tr=udp%3A%2F%2Fretracker.hotplug.ru%3A2710%2Fannounce&tr=https%3A%2F%2Fpybittrack.retiolus.net%3A443%2Fannounce&tr=http%3A%2F%2Fisk.richardsw.club%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.filemail.com%3A6969%2Fannounce&tr=https%3A%2F%2Ftracker1.520.jp%3A443%2Fannounce&tr=https%3A%2F%2Ftracker2.ctix.cn%3A443%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=https%3A%2F%2Ftracker1.ctix.cn%3A443%2Fannounce&tr=https%3A%2F%2Ft.peer-exchange.download%3A443%2Fannounce&tr=udp%3A%2F%2Ftracker-us.silksa.co.za%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.skynetcloud.site%3A6969%2Fannounce&tr=udp%3A%2F%2Fwepzone.net%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.silksa.co.za%3A6969%2Fannounce&tr=udp%3A%2F%2Ftamas3.ynh.fr%3A6969%2Fannounce&tr=udp%3A%2F%2Fjutone.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftk1.trackerservers.com%3A8080%2Fannounce&tr=https%3A%2F%2Ftracker.pmman.tech%3A443%2Fannounce&tr=http%3A%2F%2Ftracker.mywaifu.best%3A6969%2Fannounce&tr=http%3A%2F%2Fbt1.archive.org%3A6969%2Fannounce&tr=http%3A%2F%2Fbt2.archive.org%3A6969%2Fannounce`,
-    poster: posterUrl,
-    width: '100%',
-    height: '100%',
-    imdbId: imdbId,
-    lang: 'pt',
-    userLang: 'pt',
-    header: true,
-    features: {
-      autoSubtitles: true,
-      continue: true,
-      title: false,
-      p2pProgress: false,
-      subtitles: true,
-      settings: false,
-      embed: false,
-      browse: false,
-      download: true,
-      fullscreen: true,
-      playpause: true,
-      currentTime: true,
-      timeline: true,
-      duration: true,
-      volume: true,
-      chromecast: true
-    },
-    on: function (e) {
-      if (e.name == window.webtor.TORRENT_FETCHED) {
-        console.log("Torrent fetched!", e.data);
-      }
-      if (e.name == window.webtor.TORRENT_ERROR) {
-        console.log("Torrent error!");
-      }
+                // Adiciona os filmes à lista
+                movies.forEach(movie => {
+                    const movieItem = `
+                        <li>
+                            <img src="${movie.large_cover_image}" alt="${movie.title}">
+                            <div class="title">${movie.title_long}</div>
+                            <div class="genre">${movie.genres.join(', ')}</div>
+                        </li>
+                    `;
+                    movieList.append(movieItem);
+                });
+
+                $('.movie-list .title-bar .right .page-info').text(`Página ${page}`);
+            } else {
+                console.error('Nenhum filme encontrado');
+            }
+        });
     }
-  });
-}
+
+    // Função comum para atualizar filtros e recarregar filmes
+    function updateFilterAndLoadMovies() {
+        currentPage = 1; // Reseta para a primeira página
+        loadMovies(currentPage);
+    }
+
+    // Carrega os filmes da primeira página ao carregar a página
+    loadMovies(currentPage);
+
+    // Lógica para carregar a próxima página
+    $('.load-more').on('click', function () {
+        currentPage++;
+        loadMovies(currentPage);
+    });
+
+    // Lógica para alternar a sidebar
+    $('.trigger-sidebar-toggle').on('click', function () {
+        $('body').toggleClass('sidebar-is-open');
+    });
+
+    // Atualizando os filtros
+    $('.quality-filter').on('change', function () {
+        quality = $(this).val();
+        updateFilterAndLoadMovies();
+    });
+
+    $('.rating-filter').on('change', function () {
+        minimumRating = $(this).val();
+        updateFilterAndLoadMovies();
+    });
+
+    $('.search-filter').on('input', function () {
+        queryTerm = $(this).val();
+        updateFilterAndLoadMovies();
+    });
+
+    $('.genre-filter').on('change', function () {
+        genre = $(this).val();
+        updateFilterAndLoadMovies();
+    });
+
+    $('.sort-by-filter').on('change', function () {
+        sortBy = $(this).val();
+        updateFilterAndLoadMovies();
+    });
+
+    $('.order-by-filter').on('change', function () {
+        orderBy = $(this).val();
+        updateFilterAndLoadMovies();
+    });
+
+    // Código para clique nas categorias
+    $('.menu a').on('click', function (event) {
+        event.preventDefault();
+
+        const categoryMap = {
+            "Ação": "action",
+            "Aventura": "adventure",
+            "Animação": "animation",
+            "Biografia": "biography",
+            "Comédia": "comedy",
+            "Crime": "crime",
+            "Documentário": "documentary",
+            "Drama": "drama",
+            "Família": "family",
+            "Fantasia": "fantasy",
+            "História": "history",
+            "Terror": "horror",
+            "Música": "music",
+            "Mistério": "mystery",
+            "Romance": "romance",
+            "Ficção Científica": "sci-fi",
+            "Suspense": "thriller",
+            "Guerra": "war",
+            "Faroeste": "western"
+        };
+
+        const selectedCategory = $(this).text();
+        genre = categoryMap[selectedCategory] || '';
+        updateFilterAndLoadMovies();
+    });
+
+    // -----------------------------------------
+    // Configurações de Menu Superior
+    // -----------------------------------------
+
+    $('.top-menu a').on('click', function (event) {
+        event.preventDefault();
+
+        const menuOption = $(this).text();
+
+        if (menuOption === 'Início') {
+            sortBy = 'date_added'; // Mais recentes
+        } else if (menuOption === 'Populares') {
+            sortBy = 'download_count'; // Mais baixados
+        } else if (menuOption === 'Favoritos') {
+            sortBy = 'like_count'; // Mais curtidos
+        }
+
+        updateFilterAndLoadMovies();
+    });
+
+    // -----------------------------------------
+    // Início do código para o Banner Rotativo
+    // -----------------------------------------
+
+    let bannerInterval;
+    let currentIndex = 0;
+    let bannerMovies = [];
+
+    function setBanner(index) {
+        const movie = bannerMovies[index];
+        const detailsUrl = `https://yts.mx/api/v2/movie_details.json?imdb_id=${movie.imdb_code}&with_images=true&with_cast=true`;
+
+        $.get(detailsUrl, function (detailsResponse) {
+            const details = detailsResponse.data.movie;
+            // Atualizando a imagem de fundo e os textos
+            $('.featured-movie .cover').attr('src', details.background_image_original);
+            $('.featured-movie .info .title').text(details.title_long);
+            $('.featured-movie .info .description').text(details.description_full);
+        });
+    }
+
+    function startBannerRotation() {
+        bannerInterval = setInterval(function () {
+            currentIndex = (currentIndex + 1) % bannerMovies.length;
+            setBanner(currentIndex);
+        }, 5000);
+    }
+
+    function loadBannerMovies() {
+        const apiUrl = `https://yts.mx/api/v2/list_movies.json?limit=10&sort_by=like_count`;
+        $.get(apiUrl, function (response) {
+            if (response.data && response.data.movies) {
+                bannerMovies = response.data.movies;
+                setBanner(currentIndex);
+                startBannerRotation();
+            } else {
+                console.error('Nenhum filme encontrado para o banner');
+            }
+        });
+    }
+
+    loadBannerMovies();
+
+    $('.featured-movie').on('mouseenter', function () {
+        clearInterval(bannerInterval);
+    });
+
+    $('.featured-movie').on('mouseleave', function () {
+        startBannerRotation();
+    });
+
+    $('.banner-prev').on('click', function () {
+        clearInterval(bannerInterval);
+        currentIndex = (currentIndex - 1 + bannerMovies.length) % bannerMovies.length;
+        setBanner(currentIndex);
+        startBannerRotation();
+    });
+
+    $('.banner-next').on('click', function () {
+        clearInterval(bannerInterval);
+        currentIndex = (currentIndex + 1) % bannerMovies.length;
+        setBanner(currentIndex);
+        startBannerRotation();
+    });
+
+    $('.banner-prev').attr('aria-label', 'Imagem anterior do banner');
+    $('.banner-next').attr('aria-label', 'Próxima imagem do banner');
+});
