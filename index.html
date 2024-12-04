@@ -1,21 +1,183 @@
 <html lang="pt">
-
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css"> <!-- Correção na inclusão do CSS -->
-  <title>Player</title> <!-- Título da página -->
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Explorador de Filmes</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:600,300,100|Open+Sans+Condensed:300" rel="stylesheet">
+  <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilo para as setas */
+    .banner-controls {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+    }
+    .banner-prev, .banner-next {
+      background: transparent;
+      border: none;
+      font-size: 30px;
+      color: white;
+      cursor: pointer;
+    }
+    .banner-prev {
+      margin-left: 10px;
+    }
+    .banner-next {
+      margin-right: 10px;
+    }
+  </style>
 </head>
-
 <body>
-  <a id="imagem-topo-link" href="https://makingoff.eu.org/">
-    <img id="imagem-topo" src="https://i.imgur.com/1inVaQD.png" alt="MakingOff Filmes">
-  </a>
+  <div class="window">
+    <!-- Barra Lateral -->
+    <div class="sidebar">
+      <div class="top-bar">
+        <div class="logo">Filmes</div>
+      </div>
 
-  <div id="player"></div>
+      <!-- Caixa de Pesquisa -->
+      <div class="search-box">
+        <input type="text" class="search-filter" placeholder="Pesquisar filmes...">
+        <i class="fa fa-search"></i>
+      </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
-  <script src="script.js"></script> <!-- Referência ao seu script -->
+      <!-- Menu de Categorias -->
+      <div class="menu">
+        <div class="menu-name">Categorias</div>
+        <ul class="no-bullets">
+          <li><a href="#" id="categoria-acao">Ação</a></li>
+          <li><a href="#" id="categoria-aventura">Aventura</a></li>
+          <li><a href="#" id="categoria-animacao">Animação</a></li>
+          <li><a href="#" id="categoria-biografia">Biografia</a></li>
+          <li><a href="#" id="categoria-comedia">Comédia</a></li>
+          <li><a href="#" id="categoria-crime">Crime</a></li>
+          <li><a href="#" id="categoria-documentario">Documentário</a></li>
+          <li><a href="#" id="categoria-drama">Drama</a></li>
+          <li><a href="#" id="categoria-familia">Família</a></li>
+          <li><a href="#" id="categoria-fantasia">Fantasia</a></li>
+          <li><a href="#" id="categoria-historia">História</a></li>
+          <li><a href="#" id="categoria-terror">Terror</a></li>
+          <li><a href="#" id="categoria-musica">Música</a></li>
+          <li><a href="#" id="categoria-misterio">Mistério</a></li>
+          <li><a href="#" id="categoria-romance">Romance</a></li>
+          <li><a href="#" id="categoria-ficcao">Ficção Científica</a></li>
+          <li><a href="#" id="categoria-suspense">Suspense</a></li>
+          <li><a href="#" id="categoria-guerra">Guerra</a></li>
+          <li><a href="#" id="categoria-faroeste">Faroeste</a></li>
+        </ul>
+      </div>
+
+      <!-- Filtros de Pesquisa -->
+      <div class="filters">
+        <div class="filter-title">Filtros</div>
+        <div class="filter-item">
+          <label for="quality-filter">Qualidade</label>
+          <select id="quality-filter" class="quality-filter">
+            <option value="">Qualquer</option>
+            <option value="480p">480p</option>
+            <option value="720p">720p</option>
+            <option value="1080p">1080p</option>
+            <option value="1080p.x265">1080p.x265</option>
+            <option value="2160p">2160p</option>
+            <option value="3D">3D</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label for="rating-filter">Classificação Mínima</label>
+          <select id="rating-filter" class="rating-filter">
+            <option value="">Qualquer</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label for="sort-by-filter">Ordenar Por</label>
+          <select id="sort-by-filter" class="sort-by-filter">
+            <option value="">Relevância</option>
+            <option value="year">Ano</option>
+            <option value="rating">Classificação</option>
+            <option value="title">Título</option>
+            <option value="runtime">Duração</option>
+            <option value="download_count">Downloads</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label for="order-by-filter">Ordem</label>
+          <select id="order-by-filter" class="order-by-filter">
+            <option value="desc">Decrescente</option>
+            <option value="asc">Crescente</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main">
+      <div class="top-bar">
+        <ul class="top-menu">
+          <li class="menu-icon">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+          </li>
+          <li><a href="#">Início</a></li>
+          <li><a href="#">Populares</a></li>
+          <li><a href="#">Tendências</a></li>
+          <li><a href="#">Favoritos</a></li>
+        </ul>
+        <div class="profile-box">
+          <div class="circle"></div>
+          <div class="arrow"><i class="fa fa-caret-down"></i></div>
+        </div>
+      </div>
+
+      <!-- Filme em Destaque -->
+      <div class="featured-movie">
+        <img class="cover" src="" alt="Banner do filme">
+        <div class="info">
+          <h2 class="title"></h2>
+          <p class="description"></p> <!-- Descrição original do filme -->
+        </div>
+        <div class="banner-controls">
+          <button class="banner-prev"><i class="fa fa-arrow-left"></i></button>
+          <button class="banner-next"><i class="fa fa-arrow-right"></i></button>
+        </div>
+        <div class="corner-title">Filme em Destaque</div>
+      </div>
+
+      <!-- Lista de Filmes -->
+      <div class="movie-list">
+        <div class="title-bar">
+          <div class="left">
+            <p class="bold">Últimos Filmes</p>
+          </div>
+          <div class="right">
+            <span class="page-info">Página 1</span>
+          </div>
+        </div>
+        <ul class="list">
+          <!-- Lista de filmes será carregada via JavaScript -->
+        </ul>
+      </div>
+
+      <div class="load-more">Carregar Mais Filmes</div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="script.js"></script>
 </body>
-
 </html>
