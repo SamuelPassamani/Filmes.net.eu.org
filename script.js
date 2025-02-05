@@ -31,14 +31,12 @@ jQuery(document).ready(function ($) {
         // Adiciona os filmes à lista
         movies.forEach((movie) => {
           const movieItem = `
-                        <li>
-                            <img src="${movie.large_cover_image}" alt="${
-            movie.title
-          }">
-                            <div class="title">${movie.title_long}</div>
-                            <div class="genre">${movie.genres.join(", ")}</div>
-                        </li>
-                    `;
+            <li>
+              <img src="${movie.large_cover_image}" alt="${movie.title}">
+              <div class="title">${movie.title_long}</div>
+              <div class="genre">${movie.genres.join(", ")}</div>
+            </li>
+          `;
           movieList.append(movieItem);
         });
 
