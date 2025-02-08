@@ -114,7 +114,7 @@ a:hover {
 }
 
 .menu a:hover {
-  color: #fff;
+  color: #fe3132;
 }
 
 .menu .menu-name {
@@ -183,11 +183,11 @@ a:hover {
   padding: 5px;
   display: block;
   font-size: 13px;
-  color: #888;
+  color: #fe3132;
 }
 
 .menu > ul > li.active > ul li a:hover {
-  color: #fff;
+  color: #fe3132;
 }
 
 .menu > ul > li ul {
@@ -201,7 +201,7 @@ a:hover {
 }
 
 .main .top-bar {
-  background: #279ceb;
+  background: #fe3132;
 }
 
 .main .top-menu {
@@ -217,14 +217,14 @@ a:hover {
 }
 
 .main .top-menu .menu-icon:hover {
-  background: lighten(#3ab0ff, 5%);
+  background: lighten(#ff9049, 5%);
   transition-duration: 0.05s;
 }
 
 .main .top-menu .menu-icon .line {
   height: 2px;
   width: 20px;
-  background: #fff;
+  background: #ff9049;
   margin-bottom: 4px;
 }
 
@@ -235,7 +235,7 @@ a:hover {
 
 .main .top-menu li.active a,
 .main .top-menu li.active a:hover {
-  background: #3ab0ff;
+  background: #ff9049;
   color: #fff;
   font-weight: bold;
 }
@@ -249,12 +249,12 @@ a:hover {
 
 .main .top-menu a:hover {
   color: #fff;
-  background: fade(#3ab0ff, 35%);
+  background: fade(#ff9049, 35%);
 }
 
 .main .profile-box {
   float: right;
-  background: #3ab0ff;
+  background: #ff9049;
   height: 65px;
   line-height: 65px;
   padding: 0 20px;
@@ -262,7 +262,7 @@ a:hover {
 }
 
 .main .profile-box .circle {
-  background: #fff;
+  background: #fe3132;
   height: 30px;
   width: 30px;
   border-radius: 50px;
@@ -274,7 +274,7 @@ a:hover {
 .main .profile-box .arrow {
   float: left;
   margin-left: 10px;
-  line-height: 65px;
+  line-height: 55px;
 }
 
 .featured-movie {
@@ -296,7 +296,7 @@ a:hover {
   left: 20px;
   text-transform: uppercase;
   color: #fff;
-  background: rgba(25, 25, 25, 0.3);
+  background: #fe3132;
   padding: 10px;
   font-size: 13px;
 }
@@ -306,7 +306,7 @@ a:hover {
   bottom: 20px;
   left: 20px;
   color: white;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #fe3132;
   padding: 10px;
   border-radius: 5px;
   width: 90%;
@@ -392,7 +392,7 @@ a:hover {
 
 .banner-navigation .prev:hover,
 .banner-navigation .next:hover {
-  background: rgba(0, 0, 0, 0.8);
+  background: fe3132;
 }
 
 .featured-movie:hover .cover {
@@ -483,13 +483,13 @@ a:hover {
   padding: 15px 0;
   text-align: center;
   cursor: pointer;
-  color: #3ab0ff;
+  color: #ff9049;
   font-weight: bold;
   text-transform: uppercase;
 }
 
 .load-more:hover {
-  color: #279ceb;
+  color: #fe3132;
 }
 
 .sidebar-is-open {
