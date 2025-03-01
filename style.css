@@ -241,64 +241,54 @@ a:hover {
 }
 
 .main .top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background: var(--primary-color);
+  padding: 0 20px;
 }
 
 .main .top-menu {
-  height: 65px;
-  overflow: hidden;
-}
-
-.main .top-menu .menu-icon {
-  padding: 27px 20px 20px 18px;
-  display: none;
-  cursor: pointer;
-  transition-duration: 0.3s;
-}
-
-.main .top-menu .menu-icon:hover {
-  background: lighten(var(--secondary-color), 5%);
-  transition-duration: 0.05s;
-}
-
-.main .top-menu .menu-icon .line {
-  height: 2px;
-  width: 20px;
-  background: var(--secondary-color);
-  margin-bottom: 4px;
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
 }
 
 .main .top-menu li {
-  float: left;
-  font-size: 14px;
+  margin: 0 10px;
 }
 
-.main .top-menu li.active a,
-.main .top-menu li.active a:hover {
+.main .top-menu li a {
+  color: var(--text-dark-color);
+  font-size: 14px;
+  padding: 20px 15px;
+  display: block;
+  transition: background 0.3s, color 0.3s;
+}
+
+.main .top-menu li a:hover,
+.main .top-menu li.active a {
   background: var(--secondary-color);
   color: var(--background-color);
-  font-weight: bold;
 }
 
-.main .top-menu a {
-  padding: 0 25px;
-  color: var(--text-dark-color);
-  line-height: 65px;
-  display: block;
-}
-
-.main .top-menu a:hover {
+.main .top-menu li a:active {
+  background: darken(var(--secondary-color), 10%);
   color: var(--background-color);
-  background: fade(var(--secondary-color), 35%);
 }
 
 .main .profile-box {
-  float: right;
+  display: flex;
+  align-items: center;
   background: var(--secondary-color);
-  height: 65px;
-  line-height: 65px;
   padding: 0 20px;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+.main .profile-box:hover {
+  background: lighten(var(--secondary-color), 5%);
 }
 
 .main .profile-box .circle {
@@ -306,15 +296,11 @@ a:hover {
   height: 30px;
   width: 30px;
   border-radius: 50px;
-  display: block;
-  float: left;
-  margin-top: 15px;
+  margin-right: 10px;
 }
 
 .main .profile-box .arrow {
-  float: left;
-  margin-left: 10px;
-  line-height: 55px;
+  color: var(--background-color);
 }
 
 .featured-movie {
