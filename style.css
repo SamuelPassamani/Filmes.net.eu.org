@@ -332,10 +332,10 @@ a:hover {
   bottom: 20px;
   left: 20px;
   color: var(--background-color);
-  background-color: var(--primary-color);
-  padding: 10px;
+  background-color: rgba(254, 49, 50, 0.9); /* Alterado para aplicar opacidade */
+  padding: 20px; /* Aumentado para melhor espaçamento */
   border-radius: 5px;
-  width: 90%;
+  width: calc(100% - 40px); /* Ajustado para manter o espaçamento */
 }
 
 .featured-movie .title {
@@ -345,7 +345,7 @@ a:hover {
 
 .featured-movie .description {
   font-size: 16px;
-  margin-top: 5px;
+  margin-top: 10px; /* Ajustado para melhor espaçamento */
 }
 
 .featured-movie .bottom-bar {
