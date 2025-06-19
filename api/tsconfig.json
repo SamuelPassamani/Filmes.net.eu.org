@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    // --- Configuração do Ambiente e Módulos ---
+    "target": "ES2022", // Compila para uma versão moderna do JavaScript, suportada pelos Workers.
+    "module": "ESNext", // Usa o sistema de módulos JavaScript moderno.
+    "moduleResolution": "bundler", // Estratégia moderna de resolução de módulos que o Wrangler entende bem.
+
+    // --- Tipos Específicos do Cloudflare Workers ---
+    // A linha mais importante: importa os tipos globais do ambiente dos Workers (Request, Response, ExecutionContext, etc.).
+    "types": ["@cloudflare/workers-types"],
+
+    // --- Boas Práticas e Qualidade de Código ---
+    "strict": true, // Habilita todas as checagens de tipo estritas. Essencial para um código robusto.
+    "esModuleInterop": true, // Melhora a compatibilidade entre diferentes tipos de módulos.
+    "resolveJsonModule": true, // Permite importar arquivos .json como módulos.
+
+    // --- Comportamento do Compilador ---
+    // Diz ao TypeScript para NÃO gerar arquivos .js. O Wrangler cuidará do processo de compilação e empacotamento.
+    // Usamos o 'tsc' apenas para checagem de tipos.
+    "noEmit": true
+  },
+  // Diz ao TypeScript quais arquivos incluir no processo de checagem.
+  "include": ["src/**/*.ts"],
+  // E quais ignorar.
+  "exclude": ["node_modules"]
+}
