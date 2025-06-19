@@ -1,3 +1,5 @@
+# wrangler.toml (wrangler v3.88.0^)
+
 # Nome do seu serviço de Worker.
 # Este nome foi retirado da configuração de implantação que você mostrou.
 name = "filmes-api"
@@ -13,3 +15,9 @@ compatibility_date = "2024-06-18"
 # Descomente a linha abaixo se você tiver um arquivo tsconfig.json customizado na pasta /api.
 # Na maioria dos casos, o Wrangler o detecta automaticamente.
 # tsconfig = "tsconfig.json"
+
+[observability.logs]
+enabled = true
+
+
+
