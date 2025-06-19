@@ -1,0 +1,15 @@
+# Nome do seu serviço de Worker.
+# Este nome foi retirado da configuração de implantação que você mostrou.
+name = "filmes-api"
+
+# O ponto de entrada principal do seu Worker.
+# A partir da pasta /api (onde este arquivo está), o arquivo principal está em src/index.ts.
+main = "src/index.ts"
+
+# A data de compatibilidade garante que seu Worker continue funcionando da mesma forma
+# mesmo que a Cloudflare atualize a API do runtime. É uma boa prática defini-la.
+compatibility_date = "2024-06-18"
+
+# Descomente a linha abaixo se você tiver um arquivo tsconfig.json customizado na pasta /api.
+# Na maioria dos casos, o Wrangler o detecta automaticamente.
+# tsconfig = "tsconfig.json"
